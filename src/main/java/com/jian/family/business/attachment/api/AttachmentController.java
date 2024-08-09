@@ -1,6 +1,8 @@
 package com.jian.family.business.attachment.api;
 
 import com.jian.family.business.attachment.dto.AttachmentResponse;
+import com.jian.family.business.attachment.entity.AttachmentEntity;
+import com.jian.family.business.attachment.service.AttachmentService;
 import com.jian.family.config.minio.Bucket;
 import io.minio.GetObjectArgs;
 import io.minio.GetObjectResponse;
@@ -19,9 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.Future;
 
 @Slf4j
@@ -32,9 +32,14 @@ public class AttachmentController {
     @Autowired
     private MinioAsyncClient minioAsyncClient;
 
+    @Autowired
+    private AttachmentService attachmentService;
+
     @GetMapping("download")
-    public ResponseEntity<Resource> download(@RequestParam("obj") String object,
-                                             @RequestHeader(value = HttpHeaders.RANGE, required = false) String range) throws Exception {
+    public ResponseEntity<Resource> download(@RequestParam
+                                             Long id,
+                                             @RequestHeader(value = HttpHeaders.RANGE, required = false)
+                                             String range) throws Exception {
 
         var requestHeaders = new HashMap<String, String>();
 
@@ -42,8 +47,17 @@ public class AttachmentController {
             requestHeaders.put(HttpHeaders.RANGE, range);
         }
 
+        Optional<AttachmentEntity> opt = attachmentService.findById(id);
+
+        if (opt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        AttachmentEntity entity = opt.get();
+
+
         GetObjectResponse data = minioAsyncClient.getObject(GetObjectArgs.builder()
-                        .object(object)
+                        .object(entity.getObject())
                         .bucket(Bucket.CHART_ROOM.getBucket())
                         .extraHeaders(requestHeaders)
                         .build())
@@ -57,7 +71,7 @@ public class AttachmentController {
         Headers dataHeaders = data.headers();
 
         HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setContentDisposition(ContentDisposition.attachment().filename(object, StandardCharsets.UTF_8).build());
+        httpHeaders.setContentDisposition(ContentDisposition.attachment().filename(entity.getName(), StandardCharsets.UTF_8).build());
         httpHeaders.set(HttpHeaders.ACCEPT_RANGES, dataHeaders.get(HttpHeaders.ACCEPT_RANGES));
         httpHeaders.set(HttpHeaders.CONTENT_RANGE, dataHeaders.get(HttpHeaders.CONTENT_RANGE));
         httpHeaders.set(HttpHeaders.CONTENT_TYPE, dataHeaders.get(HttpHeaders.CONTENT_TYPE));
@@ -72,16 +86,24 @@ public class AttachmentController {
         var futures = new ArrayList<Future<AttachmentResponse>>(files.length);
 
         for (MultipartFile file : files) {
+
+            var name = file.getOriginalFilename();
+            var bucket = Bucket.CHART_ROOM.getBucket();
+            var object = UUID.randomUUID().toString();
+
             var future = minioAsyncClient.putObject(PutObjectArgs.builder()
-                            .bucket(Bucket.CHART_ROOM.getBucket())
+                            .bucket(bucket)
                             .contentType(file.getContentType())
                             .stream(file.getInputStream(), file.getSize(), 0)
-                            .object(file.getOriginalFilename())
+                            .object(object)
                             .build())
                     .thenApply(resp -> {
+
+                        AttachmentEntity entity = attachmentService.save(name, bucket, object);
+
                         return AttachmentResponse.builder()
-                                .id(resp.object())
-                                .name(file.getOriginalFilename())
+                                .id(entity.getId())
+                                .name(name)
                                 .success(true)
                                 .build();
                     })
