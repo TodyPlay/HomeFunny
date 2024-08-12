@@ -90,6 +90,7 @@ public class AttachmentController {
             var name = file.getOriginalFilename();
             var bucket = Bucket.CHART_ROOM.getBucket();
             var object = UUID.randomUUID().toString();
+            AttachmentEntity entity = attachmentService.save(name, bucket, object);
 
             var future = minioAsyncClient.putObject(PutObjectArgs.builder()
                             .bucket(bucket)
@@ -98,9 +99,6 @@ public class AttachmentController {
                             .object(object)
                             .build())
                     .thenApply(resp -> {
-
-                        AttachmentEntity entity = attachmentService.save(name, bucket, object);
-
                         return AttachmentResponse.builder()
                                 .id(entity.getId())
                                 .name(name)
@@ -125,5 +123,10 @@ public class AttachmentController {
 
         return result;
 
+    }
+
+    @PostMapping("remove")
+    public void remove(@RequestParam Long id) {
+        attachmentService.deleteById(id);
     }
 }
