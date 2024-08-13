@@ -58,7 +58,7 @@ public class AttachmentController {
 
         GetObjectResponse data = minioAsyncClient.getObject(GetObjectArgs.builder()
                         .object(entity.getObject())
-                        .bucket(Bucket.CHART_ROOM.getBucket())
+                        .bucket(entity.getBucket())
                         .extraHeaders(requestHeaders)
                         .build())
                 .exceptionally(ex -> null)
@@ -81,7 +81,7 @@ public class AttachmentController {
     }
 
     @PostMapping("upload")
-    public List<AttachmentResponse> upload(@RequestParam("files") MultipartFile[] files) throws Exception {
+    public List<AttachmentResponse> upload(@RequestParam("files[]") MultipartFile[] files) throws Exception {
 
         var futures = new ArrayList<Future<AttachmentResponse>>(files.length);
 
@@ -117,7 +117,7 @@ public class AttachmentController {
 
         var result = new ArrayList<AttachmentResponse>(files.length);
 
-        for (Future<AttachmentResponse> future : futures) {
+        for (var future : futures) {
             result.add(future.get());
         }
 

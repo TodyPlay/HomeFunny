@@ -1,22 +1,25 @@
 package com.jian.family.business.attachment.entity;
 
 import com.jian.family.business.attachment.entity.listener.AutoRemoveListener;
-import com.jian.family.business.user.entity.UserEntity;
+import com.jian.family.config.audit.AbstractAudit;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Comment;
-import org.springframework.data.jpa.domain.AbstractAuditable;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Getter
 @Setter
 @Entity
-@Table(name = "AttachmentEntity", uniqueConstraints = {
+@Table(name = "attachment_entity", uniqueConstraints = {
         @UniqueConstraint(name = "uc_attachment_bucket_object", columnNames = {"bucket", "object"})
 })
-@EntityListeners({AuditingEntityListener.class, AutoRemoveListener.class})
-public class AttachmentEntity extends AbstractAuditable<UserEntity, Long> {
+@EntityListeners({AutoRemoveListener.class})
+public class AttachmentEntity extends AbstractAudit {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
+    private Long id;
 
     @Comment("文件名")
     @Column(name = "name", nullable = false)

@@ -30,6 +30,7 @@ public class UserService implements UserDetailsService {
 
         UserEntity user = new UserEntity();
         user.setUsername(request.username());
+        user.setPhoneNumber(request.phoneNumber());
         user.setName(request.name());
         user.setEnabled(true);
         user.setPassword(passwordEncoder.encode(request.password()));

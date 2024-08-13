@@ -14,6 +14,7 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
+@Table(name = "user_entity")
 @Comment("用户信息表")
 public class UserEntity implements UserDetails {
 
