@@ -1,9 +1,7 @@
 package com.jian.family.config.audit;
 
 import com.jian.family.business.user.entity.UserEntity;
-import jakarta.persistence.EntityListeners;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedBy;
@@ -21,16 +19,20 @@ import java.time.LocalDateTime;
 public abstract class AbstractAudit {
 
     @CreatedDate
+    @Column(name = "create_time")
     private LocalDateTime createTime;
 
     @LastModifiedDate
+    @Column(name = "update_time")
     private LocalDateTime updateTime;
 
     @CreatedBy
     @ManyToOne
+    @JoinColumn(name = "create_by")
     private UserEntity createBy;
 
     @LastModifiedBy
     @ManyToOne
+    @JoinColumn(name = "update_by")
     private UserEntity updateBy;
 }

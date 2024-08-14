@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedModel;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -130,13 +131,13 @@ public class AttachmentController {
     }
 
     @PostMapping("list")
-    public List<AttachmentEntityDto> list(@RequestBody @Validated
-                                          AttachmentListQuery request,
-                                          Pageable pageable) {
-        return attachmentService.findAllByCondition(request, pageable);
+    public PagedModel<AttachmentEntityDto> list(@RequestBody @Validated
+                                                AttachmentListQuery request,
+                                                Pageable pageable) {
+        return new PagedModel<>(attachmentService.findAllByCondition(request, pageable));
     }
 
-    @PostMapping("remove")
+    @DeleteMapping("remove")
     public void remove(@RequestParam Long id) {
         attachmentService.deleteById(id);
     }

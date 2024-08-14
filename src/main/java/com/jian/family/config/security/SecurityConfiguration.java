@@ -1,5 +1,9 @@
 package com.jian.family.config.security;
 
+import com.jian.family.config.security.handle.AuthenticationHandler;
+import com.jian.family.config.security.handle.AuthenticationLoginConverter;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -9,7 +13,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
 import org.springframework.security.config.annotation.web.configurers.FormLoginConfigurer;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationConverter;
@@ -22,7 +25,6 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 public class SecurityConfiguration {
-
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity security,
@@ -68,9 +70,13 @@ public class SecurityConfiguration {
         return new ProviderManager(provider);
     }
 
+    @Bean
+    public AuthenticationHandler authenticationHandler() {
+        return new AuthenticationHandler();
+    }
 
     @Bean
-    public PasswordEncoder passwordEncoder() {
-        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+    public AuthenticationLoginConverter authenticationConverter() {
+        return new AuthenticationLoginConverter();
     }
 }
