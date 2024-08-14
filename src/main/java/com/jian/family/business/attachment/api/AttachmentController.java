@@ -1,6 +1,8 @@
 package com.jian.family.business.attachment.api;
 
-import com.jian.family.business.attachment.dto.AttachmentResponse;
+import com.jian.family.business.attachment.dto.AttachmentEntityDto;
+import com.jian.family.business.attachment.dto.AttachmentListQuery;
+import com.jian.family.business.attachment.dto.AttachmentUploadResponse;
 import com.jian.family.business.attachment.entity.AttachmentEntity;
 import com.jian.family.business.attachment.service.AttachmentService;
 import com.jian.family.config.minio.Bucket;
@@ -13,10 +15,12 @@ import okhttp3.Headers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -81,9 +85,9 @@ public class AttachmentController {
     }
 
     @PostMapping("upload")
-    public List<AttachmentResponse> upload(@RequestParam("files[]") MultipartFile[] files) throws Exception {
+    public List<AttachmentUploadResponse> upload(@RequestParam("files[]") MultipartFile[] files) throws Exception {
 
-        var futures = new ArrayList<Future<AttachmentResponse>>(files.length);
+        var futures = new ArrayList<Future<AttachmentUploadResponse>>(files.length);
 
         for (MultipartFile file : files) {
 
@@ -99,7 +103,7 @@ public class AttachmentController {
                             .object(object)
                             .build())
                     .thenApply(resp -> {
-                        return AttachmentResponse.builder()
+                        return AttachmentUploadResponse.builder()
                                 .id(entity.getId())
                                 .name(name)
                                 .success(true)
@@ -107,7 +111,7 @@ public class AttachmentController {
                     })
                     .exceptionally(ex -> {
                         log.debug(ex.getMessage(), ex);
-                        return AttachmentResponse.builder()
+                        return AttachmentUploadResponse.builder()
                                 .name(file.getOriginalFilename())
                                 .success(false)
                                 .exceptionMessage(ex.getMessage()).build();
@@ -115,7 +119,7 @@ public class AttachmentController {
             futures.add(future);
         }
 
-        var result = new ArrayList<AttachmentResponse>(files.length);
+        var result = new ArrayList<AttachmentUploadResponse>(files.length);
 
         for (var future : futures) {
             result.add(future.get());
@@ -123,6 +127,13 @@ public class AttachmentController {
 
         return result;
 
+    }
+
+    @PostMapping("list")
+    public List<AttachmentEntityDto> list(@RequestBody @Validated
+                                          AttachmentListQuery request,
+                                          Pageable pageable) {
+        return attachmentService.findAllByCondition(request, pageable);
     }
 
     @PostMapping("remove")

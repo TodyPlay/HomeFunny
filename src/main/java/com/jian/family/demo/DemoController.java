@@ -1,6 +1,6 @@
 package com.jian.family.demo;
 
-import com.jian.family.business.attachment.dto.AttachmentResponse;
+import com.jian.family.business.attachment.dto.AttachmentUploadResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,7 +23,7 @@ public class DemoController {
     }
 
     @PostMapping("200")
-    public AttachmentResponse _200() {
-        return AttachmentResponse.builder().name("jian").exceptionMessage("except").success(false).build();
+    public AttachmentUploadResponse _200() {
+        return AttachmentUploadResponse.builder().name("jian").exceptionMessage("except").success(false).build();
     }
 }

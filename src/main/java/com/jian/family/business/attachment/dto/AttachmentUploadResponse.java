@@ -7,7 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-public class AttachmentResponse {
+public class AttachmentUploadResponse {
 
     private Long id;
 
