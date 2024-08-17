@@ -1,6 +1,6 @@
 package com.jian.family.business.attachment.api;
 
-import com.jian.family.business.attachment.dto.AttachmentEntityDto;
+import com.jian.family.business.attachment.dto.AttachmentDto;
 import com.jian.family.business.attachment.dto.AttachmentListQuery;
 import com.jian.family.business.attachment.dto.AttachmentUploadResponse;
 import com.jian.family.business.attachment.entity.AttachmentEntity;
@@ -131,9 +131,9 @@ public class AttachmentController {
     }
 
     @PostMapping("list")
-    public PagedModel<AttachmentEntityDto> list(@RequestBody @Validated
-                                                AttachmentListQuery request,
-                                                Pageable pageable) {
+    public PagedModel<AttachmentDto> list(@RequestBody @Validated
+                                          AttachmentListQuery request,
+                                          Pageable pageable) {
         return new PagedModel<>(attachmentService.findAllByCondition(request, pageable));
     }
 

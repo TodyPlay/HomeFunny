@@ -7,5 +7,5 @@ import java.io.Serializable;
 /**
  * DTO for {@link AttachmentEntity}
  */
-public record AttachmentEntityDto(Long id, String name, String bucket, String object) implements Serializable {
+public record AttachmentDto(Long id, String name, String bucket, String object) implements Serializable {
 }

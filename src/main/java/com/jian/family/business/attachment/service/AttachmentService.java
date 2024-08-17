@@ -1,6 +1,6 @@
 package com.jian.family.business.attachment.service;
 
-import com.jian.family.business.attachment.dto.AttachmentEntityDto;
+import com.jian.family.business.attachment.dto.AttachmentDto;
 import com.jian.family.business.attachment.dto.AttachmentListQuery;
 import com.jian.family.business.attachment.entity.AttachmentEntity;
 import com.jian.family.business.attachment.repository.AttachmentRepository;
@@ -41,9 +41,9 @@ public class AttachmentService {
         repository.deleteAll(expired);
     }
 
-    public Page<AttachmentEntityDto> findAllByCondition(AttachmentListQuery request, Pageable pageable) {
+    public Page<AttachmentDto> findAllByCondition(AttachmentListQuery request, Pageable pageable) {
         Page<AttachmentEntity> byNameLike = repository.findByNameLike(request.getName(), pageable);
 
-        return byNameLike.map(ett -> new AttachmentEntityDto(ett.getId(), ett.getName(), ett.getBucket(), ett.getObject()));
+        return byNameLike.map(ett -> new AttachmentDto(ett.getId(), ett.getName(), ett.getBucket(), ett.getObject()));
     }
 }
