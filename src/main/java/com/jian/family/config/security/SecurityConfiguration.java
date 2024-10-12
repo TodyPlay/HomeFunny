@@ -2,8 +2,6 @@ package com.jian.family.config.security;
 
 import com.jian.family.config.security.handle.AuthenticationHandler;
 import com.jian.family.config.security.handle.AuthenticationLoginConverter;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;

@@ -3,7 +3,9 @@ package com.jian.family.business.attachment.service;
 import com.jian.family.business.attachment.dto.AttachmentDto;
 import com.jian.family.business.attachment.dto.AttachmentListQuery;
 import com.jian.family.business.attachment.entity.AttachmentEntity;
+import com.jian.family.business.attachment.mapper.AttachmentEntityMapper;
 import com.jian.family.business.attachment.repository.AttachmentRepository;
+import com.jian.family.business.attachment.repository.specification.AttachmentConditionSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,6 +20,8 @@ public class AttachmentService {
 
     @Autowired
     private AttachmentRepository repository;
+    @Autowired
+    private AttachmentEntityMapper attachmentEntityMapper;
 
 
     public AttachmentEntity save(String name, String bucket, String object) {
@@ -42,8 +46,9 @@ public class AttachmentService {
     }
 
     public Page<AttachmentDto> findAllByCondition(AttachmentListQuery request, Pageable pageable) {
-        Page<AttachmentEntity> byNameLike = repository.findByNameLike(request.getName(), pageable);
 
-        return byNameLike.map(ett -> new AttachmentDto(ett.getId(), ett.getName(), ett.getBucket(), ett.getObject()));
+        Page<AttachmentEntity> find = repository.findAll(new AttachmentConditionSpecification(request.getName()), pageable);
+
+        return find.map(attachmentEntityMapper::toDto);
     }
 }
